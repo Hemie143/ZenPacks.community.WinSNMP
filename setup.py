@@ -5,7 +5,7 @@
 NAME = "ZenPacks.community.WinSNMP"
 VERSION = "1.0.0dev"
 AUTHOR = "Your Name Here"
-LICENSE = ""
+LICENSE = "GPLv2"
 NAMESPACE_PACKAGES = ['ZenPacks', 'ZenPacks.community']
 PACKAGES = ['ZenPacks', 'ZenPacks.community', 'ZenPacks.community.WinSNMP']
 INSTALL_REQUIRES = ['ZenPacks.zenoss.ZenPackLib']

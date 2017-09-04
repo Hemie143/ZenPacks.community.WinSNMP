@@ -1,1 +1,41 @@
 name: ZenPacks.community.WinSNMP
+
+device_classes:
+  /Server/Windows/SNMP:
+    zProperties:
+      zSnmpMonitorIgnore: false
+      zCollectorPlugins:
+        - zenoss.snmp.NewDeviceMap
+        - zenoss.snmp.DeviceMap
+        - zenoss.snmp.SnmpV3EngineIdMap
+        - zenoss.snmp.InterfaceMap
+        - zenoss.snmp.RouteMap
+        - zenoss.snmp.NewRouteMap
+        - zenoss.snmp.IpServiceMap
+        - zenoss.snmp.HRFileSystemMap
+        - zenoss.snmp.HRSWInstalledMap
+        - zenoss.snmp.HRSWRunMap
+        - zenoss.snmp.CpuMap
+      zDeviceTemplates:
+        - Device
+
+    templates:
+      Device:
+
+        datasources:
+          CPUUsage:
+            type: Python
+            plugin_classname: ZenPacks.community.WinSNMP.dsplugins.WinCPU.WinCPU
+
+            datapoints:
+              CPUUsage:
+                rrdtype: GAUGE
+
+        graphs:
+          CPUUsage:
+            height: 100
+            width: 1000
+            units: '%'
+            graphpoints:
+              CPUUsage:
+                dpName: CPUUsage_CPUUsage

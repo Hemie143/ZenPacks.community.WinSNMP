@@ -13,7 +13,9 @@ ZenPacks.community.WinSNMP.egg-info/test_info.txt
 ZenPacks.community.WinSNMP.egg-info/top_level.txt
 ZenPacks/community/__init__.py
 ZenPacks/community/__init__.pyc
+ZenPacks/community/WinSNMP/LICENSE.txt
 ZenPacks/community/WinSNMP/__init__.py
+ZenPacks/community/WinSNMP/__init__.pyc
 ZenPacks/community/WinSNMP/zenpack.yaml
 ZenPacks/community/WinSNMP/datasources/__init__.py
 ZenPacks/community/WinSNMP/lib/__init__.py
