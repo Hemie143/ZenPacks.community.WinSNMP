@@ -3,8 +3,8 @@
 # or saved.  Do not modify them directly here.
 # NB: PACKAGES is deprecated
 NAME = "ZenPacks.community.WinSNMP"
-VERSION = "1.0.0dev"
-AUTHOR = "Your Name Here"
+VERSION = "1.0.0"
+AUTHOR = "Laurent Hemeryck"
 LICENSE = "GPLv2"
 NAMESPACE_PACKAGES = ['ZenPacks', 'ZenPacks.community']
 PACKAGES = ['ZenPacks', 'ZenPacks.community', 'ZenPacks.community.WinSNMP']

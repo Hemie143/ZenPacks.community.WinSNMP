@@ -4,6 +4,7 @@ device_classes:
   /Server/Windows/SNMP:
     zProperties:
       zSnmpMonitorIgnore: false
+      zSnmpTimeout: 30
       zCollectorPlugins:
         - zenoss.snmp.NewDeviceMap
         - zenoss.snmp.DeviceMap
@@ -31,6 +32,18 @@ device_classes:
               CPUUsage:
                 rrdtype: GAUGE
 
+          MemUsage:
+            type: Python
+            plugin_classname: ZenPacks.community.WinSNMP.dsplugins.WinMem.WinMem
+
+            datapoints:
+              MemoryTotal:
+                rrdtype: GAUGE
+              MemoryUsed:
+                rrdtype: GAUGE
+              MemoryUsedPercent:
+                rrdtype: GAUGE
+
         graphs:
           CPUUsage:
             height: 100
@@ -39,3 +52,13 @@ device_classes:
             graphpoints:
               CPUUsage:
                 dpName: CPUUsage_CPUUsage
+
+          MemoryUsedPercent:
+            height: 100
+            width: 1000
+            units: '%'
+            graphpoints:
+              MemUsage:
+                dpName: MemUsage_MemoryUsedPercent
+
+

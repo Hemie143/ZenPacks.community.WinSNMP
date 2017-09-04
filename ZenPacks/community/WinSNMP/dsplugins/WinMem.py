@@ -3,10 +3,16 @@ from ZenPacks.zenoss.PythonCollector.datasources.PythonDataSource import PythonD
 
 from pynetsnmp.twistedsnmp import AgentProxy
 
+import re
 import logging
-log = logging.getLogger('zen.WinCPU')
+log = logging.getLogger('zen.WinMem')
 
-hrProcessorLoad = '1.3.6.1.2.1.25.3.3.1.2'
+hrStorageRam = '1.3.6.1.2.1.25.2.1.2'
+hrStorageEntry =           '1.3.6.1.2.1.25.2.3.1'
+hrStorageType =            '1.3.6.1.2.1.25.2.3.1.2'
+hrStorageAllocationUnits = '1.3.6.1.2.1.25.2.3.1.4'
+hrStorageSize =            '1.3.6.1.2.1.25.2.3.1.5'
+hrStorageUsed =            '1.3.6.1.2.1.25.2.3.1.6'
 
 def get_snmp_proxy(ds0, config):
     snmp_proxy = AgentProxy(
@@ -32,7 +38,7 @@ def getTableStuff(snmp_proxy, OIDstrings):
     d = snmp_proxy.getTable(OIDstrings)
     return d
 
-class WinCPU(PythonDataSourcePlugin):
+class WinMem(PythonDataSourcePlugin):
     # List of device attributes you might need to do collection.
     proxy_attributes = (
         'zSnmpVer',
@@ -66,17 +72,21 @@ class WinCPU(PythonDataSourcePlugin):
 
     def collect(self, config):
         # Logging in this method will be to zenpython.log
-        log.debug('Starting WinCPU collect')
+        log.debug('Starting WinMem collect')
         log.debug('config:{}'.format(config))
         ds0 = config.datasources[0]
         # Open the Snmp AgentProxy connection
         self._snmp_proxy = get_snmp_proxy(ds0, config)
 
-        # Now get data - 1 scalar OIDs
-        d = getTableStuff(self._snmp_proxy, [hrProcessorLoad,
+        # Not sure yet whether to query full table or just sub-entries
+        d = getTableStuff(self._snmp_proxy, [hrStorageType,
+                                             hrStorageAllocationUnits,
+                                             hrStorageSize,
+                                             hrStorageUsed
                                              ])
-        # process here to get ..............
-        log.debug('WinCPU collect data:{}'.format(d))
+
+
+        log.debug('WinMem collect data:{}'.format(d))
         return d
 
     def onResult(self, result, config):
@@ -87,10 +97,27 @@ class WinCPU(PythonDataSourcePlugin):
         log.debug('In success - result is %s and config is %s ' % (result, config))    #  {'1.3.6.1.2.1.25.3.3.1.2': {'.1.3.6.1.2.1.25.3.3.1.2.1': 1}}
         data = self.new_data()
 
-        procVals = result[hrProcessorLoad].values()
+        oidNum = ''
+        storageTypes = result[hrStorageType]
+        for k, v in storageTypes.items():
+            if v.startswith(''.join(['.', hrStorageRam])):
+                r = re.search(r'{}.(\d+)'.format(hrStorageType), k)
+                if r:
+                    oidNum = r.group(1)
+                    break
 
-        data['values'][None]['CPUUsage'] = float(sum(procVals))/len(procVals)
-        data['events'] = []
+        storageUsed = int(result[hrStorageUsed]['.{}.{}'.format(hrStorageUsed, oidNum)])
+        storageSize = int(result[hrStorageSize]['.{}.{}'.format(hrStorageSize, oidNum)])
+        storageUnits = int(result[hrStorageAllocationUnits]['.{}.{}'.format(hrStorageAllocationUnits, oidNum)])
+
+        data['values'][None]['MemoryUsedPercent'] = (100.0 * storageUsed) / storageSize
+        data['values'][None]['MemoryTotal'] = storageSize * storageUnits
+        data['values'][None]['MemoryUsed'] = storageUsed * storageUnits
+        data['events'] = [{
+            'summary': 'WinMem data with zenpython is OK',
+            'eventKey': 'WinMem',
+            'severity': 0,
+            }]
         data['maps'] = []
         log.debug('data is %s ' % (data))
         return data
@@ -100,13 +127,13 @@ class WinCPU(PythonDataSourcePlugin):
         log.debug('In OnError - result is %s and config is %s ' % (result, config))
         return {
             'events': [{
-                'summary': 'Error getting WinCPU data with zenpython: %s' % result,
-                'eventKey': 'WinCPU',
+                'summary': 'Error getting WinMem data with zenpython: %s' % result,
+                'eventKey': 'WinMem',
                 'severity': 4,
             }],
         }
 
     def onComplete(self, result, config):
-        log.debug('Starting WinCPU onComplete')
+        log.debug('Starting WinMem onComplete')
         self._snmp_proxy.close()
         return result
