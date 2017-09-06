@@ -44,6 +44,25 @@ device_classes:
               MemoryUsedPercent:
                 rrdtype: GAUGE
 
+        thresholds:
+          CPU Usage:
+            type: DurationThreshold
+            dsnames: [CPUUsage_CPUUsage]
+            eventClass: /Perf/CPU
+            severity: Warning
+            maxval: 95
+            timePeriod: 20 minutes
+            violationPercentage: 100
+
+          Memory Usage:
+            type: DurationThreshold
+            dsnames: [MemUsage_MemoryUsedPercent]
+            eventClass: /Perf/Memory
+            severity: Warning
+            maxval: 95
+            timePeriod: 20 minutes
+            violationPercentage: 100
+
         graphs:
           CPUUsage:
             height: 100
